@@ -1,5 +1,6 @@
 name: build-apk
 on: [workflow_dispatch, push]
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -11,6 +12,7 @@ jobs:
         with:
           workdir: .
           buildozer_version: stable
+          buildozer_command: buildozer -v android debug
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
