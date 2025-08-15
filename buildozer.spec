@@ -7,11 +7,11 @@ source.dir = .
 source.include_exts = py,kv,png,jpg,ttf,txt,mp3,wav
 requirements = python3,kivy==2.3.0,numpy==1.26.5
 p4a.bootstrap = sdl2
-
-# Android
+p4a.branch = develop          # <-- NUEVO: recipes actualizadas
 android.api = 34
 android.minapi = 24
 android.ndk_api = 24
+android.arch = arm64-v8a      # <-- NUEVO: compila solo 64-bit (menos riesgo)
 orientation = portrait
 fullscreen = 0
 
