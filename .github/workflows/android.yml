@@ -10,9 +10,14 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Clean buildozer caches
+        run: rm -rf .buildozer .buildozer_global bin
+
       - name: Build with Buildozer
         uses: ArtemSBulgakov/buildozer-action@v1
         id: buildozer
+        env:
+          BUILDOZER_ANDROID_NDK: 25b
         with:
           workdir: .
           buildozer_version: stable
