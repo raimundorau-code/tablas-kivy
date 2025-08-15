@@ -4,22 +4,21 @@ package.name = tablas
 package.domain = org.tuempresa
 version = 0.1.0
 
-# Código fuente
 source.dir = .
 source.include_exts = py,kv,png,jpg,ttf,txt,mp3,wav
 
-# Dependencias (combo estable)
-requirements = python3,kivy==2.2.1,numpy==1.26.4
+# Kivy + NumPy (combo estable)
+requirements = python3,kivy==2.3.0,numpy==1.26.5
 p4a.bootstrap = sdl2
+p4a.branch = develop
 
-# Android (API objetivo y NDK fijo)
+# Android
 android.api = 34
 android.minapi = 24
 android.ndk_api = 24
 android.ndk = 25b
 android.arch = arm64-v8a
 
-# UI
 orientation = portrait
 fullscreen = 0
 
