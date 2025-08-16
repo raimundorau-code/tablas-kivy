@@ -7,9 +7,12 @@ version = 0.1.0
 source.dir = .
 source.include_exts = py,kv,png,jpg,ttf,txt,mp3,wav
 
-# Kivy + NumPy (combo estable)
+# Kivy + NumPy
 requirements = python3,kivy==2.3.0,numpy==1.26.5
 p4a.bootstrap = sdl2
+
+# Fuerza python-for-android a la rama develop (recipes más nuevas)
+p4a.fork = kivy
 p4a.branch = develop
 
 # Android
