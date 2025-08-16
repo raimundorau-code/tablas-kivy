@@ -15,9 +15,19 @@ jobs:
         with:
           persist-credentials: false
 
-      # Limpieza total para evitar residuos de builds previos
-      - name: Clean caches
-        run: rm -rf .buildozer .buildozer_global bin
+      # PASO AÑADIDO: Guardar y restaurar la caché de Buildozer
+      # Esto acelerará drásticamente las compilaciones futuras.
+      - name: Cache Buildozer dependencies
+        uses: actions/cache@v4
+        with:
+          path: .buildozer_global # Directorio a guardar en caché
+          key: buildozer-cache-${{ runner.os }}-${{ hashFiles('**/buildozer.spec') }}
+          restore-keys: |
+            buildozer-cache-${{ runner.os }}-
+
+      # PASO ELIMINADO: La limpieza ya no es necesaria con la caché.
+      # - name: Clean caches
+      #   run: rm -rf .buildozer .buildozer_global bin
 
       - name: Build with Buildozer
         uses: ArtemSBulgakov/buildozer-action@v1
