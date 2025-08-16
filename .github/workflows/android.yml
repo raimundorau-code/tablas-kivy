@@ -1,7 +1,6 @@
 name: build-apk
 on: [workflow_dispatch, push]
 
-# Evita colas: al hacer un nuevo commit cancela el build anterior
 concurrency:
   group: build-${{ github.ref }}
   cancel-in-progress: true
@@ -15,19 +14,17 @@ jobs:
         with:
           persist-credentials: false
 
-      # PASO AÑADIDO: Guardar y restaurar la caché de Buildozer
-      # Esto acelerará drásticamente las compilaciones futuras.
+      # PASO AÑADIDO: Instalar las librerías del sistema necesarias para compilar NumPy.
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libopenblas-dev
+
       - name: Cache Buildozer dependencies
         uses: actions/cache@v4
         with:
-          path: .buildozer_global # Directorio a guardar en caché
+          path: .buildozer_global
           key: buildozer-cache-${{ runner.os }}-${{ hashFiles('**/buildozer.spec') }}
           restore-keys: |
             buildozer-cache-${{ runner.os }}-
-
-      # PASO ELIMINADO: La limpieza ya no es necesaria con la caché.
-      # - name: Clean caches
-      #   run: rm -rf .buildozer .buildozer_global bin
 
       - name: Build with Buildozer
         uses: ArtemSBulgakov/buildozer-action@v1
