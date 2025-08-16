@@ -9,9 +9,9 @@ source.dir = .
 source.include_exts = py,kv,png,jpg,ttf,txt,mp3,wav
 
 # DEPENDENCIAS
-# Corregido: Fijamos numpy a una versión estable (1.24.4) para asegurar
-# la compatibilidad con los parches del sistema de compilación.
-requirements = python3,kivy==2.2.1,numpy==1.24.4
+# Corregido: Re-añadimos la 'v' a la versión de numpy,
+# ya que la receta siempre usa git para la descarga.
+requirements = python3,kivy==2.2.1,numpy==v1.24.4
 
 # Bootstrap
 p4a.bootstrap = sdl2
