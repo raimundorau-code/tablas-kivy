@@ -15,7 +15,7 @@ jobs:
 
       - name: Build with Buildozer
         uses: ArtemSBulgakov/buildozer-action@v1
-        id: buildozer
+        id: buildozer 
         env:
           BUILDOZER_ANDROID_NDK: 25b
         with:
