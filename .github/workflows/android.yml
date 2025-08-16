@@ -1,6 +1,11 @@
 name: build-apk
 on: [workflow_dispatch, push]
 
+# Evita colas: al hacer un nuevo commit cancela el build anterior
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -10,6 +15,7 @@ jobs:
         with:
           persist-credentials: false
 
+      # Limpieza total para evitar residuos de builds previos
       - name: Clean caches
         run: rm -rf .buildozer .buildozer_global bin
 
