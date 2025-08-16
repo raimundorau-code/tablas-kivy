@@ -8,20 +8,20 @@ version = 0.1.0
 source.dir = .
 source.include_exts = py,kv,png,jpg,ttf,txt,mp3,wav
 
-# DEPENDENCIAS
-# Corregido: Re-añadimos la 'v' a la versión de numpy,
-# ya que la receta siempre usa git para la descarga.
-requirements = python3,kivy==2.2.1,numpy==v1.24.4
+# DEPENDENCIAS PROBADAS
+# Esta es una combinación muy estable y usada por la comunidad.
+requirements = python3,kivy==2.1.0,numpy==v1.22.4
 
 # Bootstrap
 p4a.bootstrap = sdl2
 
-# Recipes recientes de python-for-android
+# Se mantiene la rama 'master' (estable) de python-for-android.
 p4a.fork = kivy
-p4a.branch = develop
+p4a.branch = master
 
 # Android
-android.api = 34
+# Se usa la API 31 (Android 12), un objetivo muy estable y compatible.
+android.api = 31
 android.minapi = 24
 android.ndk_api = 24
 android.ndk = 25b
