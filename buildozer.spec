@@ -8,10 +8,10 @@ version = 0.1.0
 source.dir = .
 source.include_exts = py,kv,png,jpg,ttf,txt,mp3,wav
 
-# Dependencias (Kivy + NumPy). Nota: NumPy con prefijo 'v'
-requirements = python3,kivy==2.3.0,numpy==v1.26.5
+# Dependencias (NumPy apuntando al tag correcto con 'v')
+requirements = python3,kivy==2.3.0,numpy@https://github.com/numpy/numpy.git@v1.26.5
 
-# Bootstrap de Kivy/SDL2
+# Bootstrap Kivy/SDL2
 p4a.bootstrap = sdl2
 
 # Usar recipes recientes de python-for-android
