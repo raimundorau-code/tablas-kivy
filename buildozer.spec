@@ -10,7 +10,8 @@ source.include_exts = py,kv,png,jpg,ttf,txt,mp3,wav
 
 # DEPENDENCIAS (combo estable)
 # Nota: NO uses URLs de GitHub aquí; PyPI funciona mejor con p4a.
-requirements = python3,kivy==2.2.1,numpy==1.26.4
+# Corregido: Se añadió la 'v' a la versión de numpy
+requirements = python3,kivy==2.2.1,numpy==v1.26.4
 
 # Bootstrap
 p4a.bootstrap = sdl2
@@ -24,7 +25,8 @@ android.api = 34
 android.minapi = 24
 android.ndk_api = 24
 android.ndk = 25b
-android.arch = arm64-v8a
+# Corregido: Se cambió 'android.arch' por 'android.archs'
+android.archs = arm64-v8a
 
 # UI
 orientation = portrait
