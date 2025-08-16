@@ -9,9 +9,9 @@ source.dir = .
 source.include_exts = py,kv,png,jpg,ttf,txt,mp3,wav
 
 # DEPENDENCIAS
-# Corregido: Eliminamos la versión específica de numpy para dejar que
-# python-for-android resuelva la dependencia automáticamente.
-requirements = python3,kivy==2.2.1,numpy
+# Corregido: Fijamos numpy a una versión estable (1.24.4) para asegurar
+# la compatibilidad con los parches del sistema de compilación.
+requirements = python3,kivy==2.2.1,numpy==1.24.4
 
 # Bootstrap
 p4a.bootstrap = sdl2
