@@ -12,7 +12,7 @@ from kivy.lang import Builder
 import random
 import numpy as np
 import tempfile
-import wave # Se importa la librería wave
+import wave 
 
 # --- Se Carga el Diseño de la Interfaz (.kv) como un string ---
 KV_STRING = """
@@ -42,7 +42,7 @@ KV_STRING = """
                 font_size: '18sp'
             TextInput:
                 id: questions_input
-                text: '10'
+                text: '20'  # CAMBIO: Valor por defecto a 20
                 font_size: '18sp'
                 multiline: False
                 input_filter: 'int'
@@ -52,7 +52,7 @@ KV_STRING = """
                 font_size: '18sp'
             TextInput:
                 id: time_input
-                text: '3'
+                text: '12'  # CAMBIO: Valor por defecto a 12
                 font_size: '18sp'
                 multiline: False
                 input_filter: 'float'
@@ -185,7 +185,7 @@ KV_STRING = """
 """
 Builder.load_string(KV_STRING)
 
-# --- Funciones para generar sonidos (TU VERSIÓN CORREGIDA) ---
+# --- Funciones para generar sonidos ---
 def generate_sound(frequency=440, duration=0.2, sample_rate=22050):
     t = np.linspace(0, duration, int(sample_rate * duration), endpoint=False)
     amplitude = int(0.5 * np.iinfo(np.int16).max)
@@ -195,8 +195,8 @@ def generate_sound(frequency=440, duration=0.2, sample_rate=22050):
         with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
             fname = tmp.name
         with wave.open(fname, 'wb') as wf:
-            wf.setnchannels(1)        # mono
-            wf.setsampwidth(2)        # 16-bit
+            wf.setnchannels(1)
+            wf.setsampwidth(2)
             wf.setframerate(sample_rate)
             wf.writeframes(wav_data.tobytes())
 
@@ -286,7 +286,8 @@ class GameScreen(Screen):
             attempts = 0
             while attempts < 50:
                 factor1 = random.choice(self.manager.app.selected_tables)
-                factor2 = random.randint(2, 10)
+                # CAMBIO: El rango ahora es de 2 a 9
+                factor2 = random.randint(2, 9)
                 new_question = (factor1, factor2)
                 is_last = (new_question == self.last_question)
                 count = self.question_counts.get(new_question, 0)
@@ -298,10 +299,11 @@ class GameScreen(Screen):
             
             if not question_to_ask:
                 factor1 = random.choice(self.manager.app.selected_tables)
-                factor2 = random.randint(2, 10)
+                factor2 = random.randint(2, 9)
                 question_to_ask = (factor1, factor2)
                 if question_to_ask == self.last_question:
-                    factor2 = (factor2 % 9) + 2
+                    # CAMBIO: Lógica de fallback ajustada al nuevo rango
+                    factor2 = (factor2 % 8) + 2 
                     question_to_ask = (factor1, factor2)
         
         self.factor1, self.factor2 = question_to_ask
@@ -404,8 +406,9 @@ class ScoreScreen(Screen):
 # --- Clase Principal de la App ---
 class TablasApp(App):
     selected_tables = ListProperty([])
-    total_questions_config = NumericProperty(10)
-    time_per_question_config = NumericProperty(3.0)
+    # CAMBIO: Valores por defecto actualizados
+    total_questions_config = NumericProperty(20)
+    time_per_question_config = NumericProperty(12.0)
     final_correct = NumericProperty(0)
     final_incorrect = NumericProperty(0)
     correct_sound = ObjectProperty(None, allownone=True)
