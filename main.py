@@ -42,7 +42,7 @@ KV_STRING = """
                 font_size: '18sp'
             TextInput:
                 id: questions_input
-                text: '20'  # CAMBIO: Valor por defecto a 20
+                text: '20'
                 font_size: '18sp'
                 multiline: False
                 input_filter: 'int'
@@ -52,7 +52,7 @@ KV_STRING = """
                 font_size: '18sp'
             TextInput:
                 id: time_input
-                text: '12'  # CAMBIO: Valor por defecto a 12
+                text: '12'
                 font_size: '18sp'
                 multiline: False
                 input_filter: 'float'
@@ -171,16 +171,30 @@ KV_STRING = """
     BoxLayout:
         orientation: 'vertical'
         padding: 20
-        spacing: 20
+        spacing: 10
         
         Label:
+            id: final_score_label
             text: root.final_score_text
-            font_size: '28sp'
+            font_size: '24sp'
+            size_hint_y: 0.2
             halign: 'center'
+
+        ScrollView:
+            bar_width: 10
+            scroll_type: ['bars', 'content']
+            bar_color: (0.6, 0.6, 0.6, 0.9)
+            bar_inactive_color: (0.6, 0.6, 0.6, 0.4)
+            GridLayout:
+                id: mistakes_grid
+                cols: 1
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: 5
 
         Button:
             text: 'Jugar de Nuevo'
-            size_hint_y: 0.2
+            size_hint_y: 0.15
             on_press: root.play_again()
 """
 Builder.load_string(KV_STRING)
@@ -199,7 +213,6 @@ def generate_sound(frequency=440, duration=0.2, sample_rate=22050):
             wf.setsampwidth(2)
             wf.setframerate(sample_rate)
             wf.writeframes(wav_data.tobytes())
-
         return SoundLoader.load(fname)
     except Exception as e:
         print(f"Error al generar o cargar el sonido: {e}")
@@ -247,6 +260,7 @@ class GameScreen(Screen):
     last_question = None
     question_counts = {}
     failed_questions = []
+    summary_of_fails = []
 
     def on_enter(self, *args):
         self.total_questions = self.manager.app.total_questions_config
@@ -265,6 +279,7 @@ class GameScreen(Screen):
         self.last_question = None
         self.question_counts = {}
         self.failed_questions = []
+        self.summary_of_fails = []
         self.next_question()
 
     def next_question(self):
@@ -286,7 +301,6 @@ class GameScreen(Screen):
             attempts = 0
             while attempts < 50:
                 factor1 = random.choice(self.manager.app.selected_tables)
-                # CAMBIO: El rango ahora es de 2 a 9
                 factor2 = random.randint(2, 9)
                 new_question = (factor1, factor2)
                 is_last = (new_question == self.last_question)
@@ -302,7 +316,6 @@ class GameScreen(Screen):
                 factor2 = random.randint(2, 9)
                 question_to_ask = (factor1, factor2)
                 if question_to_ask == self.last_question:
-                    # CAMBIO: Lógica de fallback ajustada al nuevo rango
                     factor2 = (factor2 % 8) + 2 
                     question_to_ask = (factor1, factor2)
         
@@ -344,36 +357,31 @@ class GameScreen(Screen):
                 self.failed_questions.remove(current_q)
             Clock.schedule_once(lambda dt: self.next_question(), 0.5)
         else:
-            self.incorrect_answers += 1
-            if self.manager.app.incorrect_sound: self.manager.app.incorrect_sound.play()
-            self.show_solution_popup(f"Respuesta: {self.correct_result}")
-            if current_q not in self.failed_questions:
-                self.failed_questions.append(current_q)
-            Clock.schedule_once(lambda dt: self.next_question(), 1.6)
+            self.handle_fail()
 
     def handle_incorrect_answer(self):
         self.stop_timer()
+        self.handle_fail(from_timeout=True)
+
+    def handle_fail(self, from_timeout=False):
         self.incorrect_answers += 1
         if self.manager.app.incorrect_sound: self.manager.app.incorrect_sound.play()
-        self.show_solution_popup(f"Respuesta: {self.correct_result}")
+        
+        current_q_tuple = (self.factor1, self.factor2, self.correct_result)
+        # CAMBIO: Se añade al resumen final solo si no está ya en la lista.
+        if current_q_tuple not in self.summary_of_fails:
+            self.summary_of_fails.append(current_q_tuple)
+
         current_q = (self.factor1, self.factor2)
         if current_q not in self.failed_questions:
             self.failed_questions.append(current_q)
+        
+        self.show_solution_popup(f"Respuesta: {self.correct_result}")
         Clock.schedule_once(lambda dt: self.next_question(), 1.6)
         
     def show_solution_popup(self, solution_text):
-        popup_content = Label(
-            text=solution_text,
-            font_size='28sp',
-            bold=True,
-            color=(1, 0.2, 0.2, 1)
-        )
-        popup = Popup(
-            title='¡Ups!',
-            content=popup_content,
-            size_hint=(0.6, 0.4),
-            auto_dismiss=False
-        )
+        popup_content = Label(text=solution_text, font_size='28sp', bold=True, color=(1, 0.2, 0.2, 1))
+        popup = Popup(title='¡Ups!', content=popup_content, size_hint=(0.6, 0.4), auto_dismiss=False)
         popup.open()
         Clock.schedule_once(popup.dismiss, 1.5)
 
@@ -392,6 +400,7 @@ class GameScreen(Screen):
     def end_game(self):
         self.manager.app.final_correct = self.correct_answers
         self.manager.app.final_incorrect = self.incorrect_answers
+        self.manager.app.final_failed_list = self.summary_of_fails
         self.manager.current = 'score'
 
 # --- Pantalla de Puntuación Final ---
@@ -399,18 +408,32 @@ class ScoreScreen(Screen):
     final_score_text = StringProperty('')
     def on_enter(self, *args):
         app = self.manager.app
-        self.final_score_text = (f"¡Juego Terminado!\n\nCorrectas: {app.final_correct}\nIncorrectas: {app.final_incorrect}")
+        self.ids.final_score_label.text = (f"¡Juego Terminado!\nCorrectas: {app.final_correct} | Incorrectas: {app.final_incorrect}")
+        
+        self.ids.mistakes_grid.clear_widgets()
+        if app.final_failed_list:
+            title = Label(text="Repaso de errores:", font_size='20sp', size_hint_y=None, height='40dp', bold=True)
+            self.ids.mistakes_grid.add_widget(title)
+            for f1, f2, result in app.final_failed_list:
+                mistake_label = Label(
+                    text=f"{f1} x {f2} = {result}",
+                    font_size='18sp',
+                    size_hint_y=None,
+                    height='30dp'
+                )
+                self.ids.mistakes_grid.add_widget(mistake_label)
+
     def play_again(self):
         self.manager.current = 'menu'
 
 # --- Clase Principal de la App ---
 class TablasApp(App):
     selected_tables = ListProperty([])
-    # CAMBIO: Valores por defecto actualizados
     total_questions_config = NumericProperty(20)
     time_per_question_config = NumericProperty(12.0)
     final_correct = NumericProperty(0)
     final_incorrect = NumericProperty(0)
+    final_failed_list = ListProperty([])
     correct_sound = ObjectProperty(None, allownone=True)
     incorrect_sound = ObjectProperty(None, allownone=True)
 
